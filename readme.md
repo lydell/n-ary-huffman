@@ -1,4 +1,4 @@
-Overview
+Overview [![Build Status](https://travis-ci.org/lydell/n-ary-huffman.png?branch=master)](https://travis-ci.org/lydell/n-ary-huffman)
 ========
 
 ```js
