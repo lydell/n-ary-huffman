@@ -1,0 +1,19 @@
+{
+  "name": "n-ary-huffman",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "An n-ary Huffman algorithm implementation.",
+  "repository": "lydell/n-ary-huffman",
+  "keywords": [
+    "huffman",
+    "n-ary"
+  ],
+  "scripts": {
+    "test": "mocha",
+    "build": "coffee --compile --bare index.coffee"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.8.0",
+    "mocha": "^2.0.1"
+  }
+}
