@@ -30,9 +30,9 @@ object will be given a _code word._ The larger the weight, the shorter the code
 word.
 
 `options`:
-  - alphabet: `String`. The characters to use for the code words. If some
-    characters are preferred over others, put them longer to the left. Note:
-    Don’t repeat characters, or you’ll get invalid code words.
+  - alphabet: `String` or `Array`. The characters to use for the code words. If
+    some characters are preferred over others, put them longer to the left.
+    Note: Don’t repeat characters, or you’ll get invalid code words.
 
 `callback(element, codeWord)` is run for each object in `elements`.
 

@@ -105,3 +105,12 @@ suite "huffman", ->
   test "prevent infinite recursion", ->
     assert.throws (-> huffman [], {alphabet: "" }, ->), RangeError
     assert.throws (-> huffman [], {alphabet: "0"}, ->), RangeError
+
+
+  test "alphabet as array", ->
+    testCodes ["0", "1"], [
+      {value: "a", weight: 4, expected: "000"}
+      {value: "b", weight: 3, expected: "001"}
+      {value: "c", weight: 6, expected: "01"}
+      {value: "d", weight: 8, expected: "1"}
+    ]
