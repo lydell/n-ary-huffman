@@ -9,7 +9,7 @@
     "n-ary"
   ],
   "scripts": {
-    "test": "mocha",
+    "test": "mocha --ui tdd --compilers coffee:coffee-script/register",
     "build": "coffee --compile --bare index.coffee"
   },
   "devDependencies": {
