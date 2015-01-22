@@ -7,63 +7,105 @@ createTree = (originalElements, numBranches)->
   unless numBranches >= 2
     throw new RangeError("`numBranches` must be at least 2")
 
-  # Shallow working copy.
-  elements = originalElements[..]
-  numElements = elements.length
+  numElements = originalElements.length
 
-  # Sort the elements after their weights, in descending order, so that the last
-  # ones will be the ones with lowest weight.
-  elements.sort((a, b)-> b.weight - a.weight)
+  # Special cases.
+  if numElements == 0
+    return new BranchPoint([], 0)
+  if numElements == 1
+    [element] = originalElements
+    return new BranchPoint([element], element.weight)
 
-  # Optimization.
-  if numElements <= numBranches
-    return new BranchingPoint(elements)
+  # Sort the elements after their weights, in ascending order, so that the first
+  # ones will be the ones with lowest weight. This is done on a shallow working
+  # copy in order not to modify the original array.
+  elements = originalElements[..].sort((a, b)-> a.weight - b.weight)
 
   # A `numBranches`-ary tree can be formed by `1 + (numBranches - 1) * n`
-  # elements: There is the root of the tree (`1`), and each branching adds
+  # elements: There is the root of the tree (`1`), and each branch point adds
   # `numBranches` elements to the total number or elements, but replaces itself
-  # (`numBranches - 1`). `n` is the number of points where the tree branches. In
-  # order to create the tree using `numElements` elements, we need to find an
-  # `n` such that `1 + (numBranches - 1) * n >= numElements` (1), and then pad
-  # `numElements`, such that `1 + (numBranches - 1) * n == numElements +
-  # padding` (2).
-  #
-  # Solving for `n = numBranchPoints` in (1) gives:
+  # (`numBranches - 1`). `n` is the number of points where the tree branches
+  # (therefore, `n` is an integer). In order to create the tree using
+  # `numElements` elements, we need to find the smallest `n` such that `1 +
+  # (numBranches - 1) * n == numElements + padding`. We need to add `padding`
+  # since `n` is an integer and there might not be an integer `n` that makes
+  # the left-hand side equal to `numElements`. Solving for `padding` gives
+  # `padding = 1 + (numBranches - 1) * n - numElements`. Since `padding >= 0`
+  # (we won’t reduce the number of elements, only add extra dummy ones), it
+  # follows that `n >= (numElements - 1) / (numBranches - 1)`. The smallest
+  # integer `n = numBranchPoints` is then:
   numBranchPoints = Math.ceil((numElements - 1) / (numBranches - 1))
-  # Solving for `padding` in (2) gives:
-  padding = 1 + (numBranches - 1) * numBranchPoints - numElements
+  # The above gives the padding:
+  numPadding = 1 + (numBranches - 1) * numBranchPoints - numElements
 
-  # Pad with zero-weights to be able to form a `numBranches`-ary tree.
-  for i in [0...padding] by 1
-    elements.push(new Padding)
+  # All the `numBranchPoints` branch points will be stored in this array instead
+  # of splicing them into the `elements` array. This way we do not need to
+  # search for the correct index to maintain the sort order. This array, and all
+  # other below, are created with the correct length from the beginning for
+  # performance.
+  branchPoints = Array(numBranchPoints)
 
-  # Construct the Huffman tree.
-  for i in [0...numBranchPoints] by 1
-    # Replace `numBranches` of the lightest weights with their sum.
-    sum = new BranchingPoint(elements.splice(-numBranches, numBranches))
+  # These indexes will be used instead of pushing, popping, shifting and
+  # unshifting arrays for performance.
+  latestBranchPointIndex = 0
+  branchPointIndex       = 0
+  elementIndex           = 0
 
-    # Find the index to insert the sum so that the sorting is maintained. This
-    # is faster than sorting the elements in each iteration.
-    break for element, index in elements by -1 when sum.weight <= element.weight
-    elements.splice(index + 1, 0, sum)
+  # The first branch point is the only one that can have fewer than
+  # `numBranches` branches. One _could_ add `numPadding` dummy elements, but
+  # this algorithm does not. (Why would that be useful?)
+  if numPadding > 0
+    elementIndex = numBranches - numPadding
+    weight = 0
+    children = Array(elementIndex)
+    childIndex = 0
+    while childIndex < elementIndex
+      element = elements[childIndex]
+      children[childIndex] = element
+      weight += element.weight
+      childIndex++
+    branchPoints[0] = new BranchPoint(children, weight)
+    latestBranchPointIndex = 1
 
-  [root] = elements # `elements.length == 1` by now.
+  # Create (the rest of) the `numBranchPoints` branch points.
+  nextElement = elements[elementIndex]
+  while latestBranchPointIndex < numBranchPoints
+    weight = 0
+    children = Array(numBranches)
+    childIndex = 0
+    nextBranchPoint = branchPoints[branchPointIndex]
+    # Put the next `numBranches` smallest weights in the `children` array.
+    while childIndex < numBranches
+      # The smallest weight is either the next element or the next branch point.
+      if not nextElement? or # No elements, only branch points left.
+         (nextBranchPoint? and nextBranchPoint.weight <= nextElement.weight)
+        lowestWeight = nextBranchPoint
+        branchPointIndex++
+        nextBranchPoint = branchPoints[branchPointIndex]
+      else
+        lowestWeight = nextElement
+        elementIndex++
+        nextElement = elements[elementIndex]
+      children[childIndex] = lowestWeight
+      weight += lowestWeight.weight
+      childIndex++
+    branchPoints[latestBranchPointIndex] = new BranchPoint(children, weight)
+    latestBranchPointIndex++
+
+  root = branchPoints[numBranchPoints - 1]
   root
 
-class Padding
-  weight: 0
-
-class BranchingPoint
-  constructor: (@children)->
-    @weight = @children.reduce(((sum, element)-> sum + element.weight), 0)
+class BranchPoint
+  constructor: (@children, @weight)->
 
   assignCodeWords: (alphabet, callback, prefix="")->
-    for node, index in @children
-      codeWord = prefix + alphabet[index]
-      if node instanceof BranchingPoint
+    index = 0
+    for node in @children by -1
+      codeWord = prefix + alphabet[index++]
+      if node instanceof BranchPoint
         node.assignCodeWords(alphabet, callback, codeWord)
       else
-        callback(node, codeWord) unless node instanceof Padding
+        callback(node, codeWord)
     return
 
-module.exports = {createTree, Padding, BranchingPoint}
+module.exports = {createTree, BranchPoint}

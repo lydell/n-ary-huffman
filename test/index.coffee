@@ -12,6 +12,8 @@ verifyCode = (item, code)->
 
 testCodes = (alphabet, elements)->
   tree = huffman.createTree(elements, alphabet.length)
+  # Make sure that the `children` array always is a copy.
+  assert.notEqual tree.children, elements
   tree.assignCodeWords alphabet, verifyCode
 
 suite "codes", ->
@@ -68,12 +70,12 @@ suite "codes", ->
 
   test "Equal weights", ->
     testCodes "01", [
-      {value: "a", weight: 1, expected: "010"}
-      {value: "b", weight: 1, expected: "011"}
-      {value: "c", weight: 1, expected: "000"}
-      {value: "d", weight: 1, expected: "001"}
-      {value: "e", weight: 1, expected: "10"}
-      {value: "f", weight: 1, expected: "11"}
+      {value: "a", weight: 1, expected: "011"}
+      {value: "b", weight: 1, expected: "010"}
+      {value: "c", weight: 1, expected: "001"}
+      {value: "d", weight: 1, expected: "000"}
+      {value: "e", weight: 1, expected: "11"}
+      {value: "f", weight: 1, expected: "10"}
     ]
 
 
@@ -143,9 +145,11 @@ suite "codes", ->
 suite "createTree", ->
 
   test "empty list", ->
-    tree = huffman.createTree([], 2)
+    elements = []
+    tree = huffman.createTree(elements, 2)
     assert.equal tree.weight, 0
     assert.equal tree.children.length, 0
+    assert.notEqual tree.children, elements
     tree.assignCodeWords "01", ->
       assert false, "Expected callback not to run"
 
@@ -155,35 +159,16 @@ suite "createTree", ->
     assert.throws (-> huffman.createTree([], 1)), RangeError
 
 
-  test "returns BranchingPoint", ->
-    assert huffman.createTree([], 2) instanceof huffman.BranchingPoint
-
-
-suite "Padding", ->
-
-  test "zero weight", ->
-    padding = new huffman.Padding
-    assert.equal padding.weight, 0
-
-
-  test "can appear in BranchingPoint children", ->
-    tree = huffman.createTree([
-      {weight: 1}
-      {weight: 1}
-      {weight: 1}
-      {weight: 1}
-    ], 3)
-    assert tree.children[0].children[2] instanceof huffman.Padding
-
-
-suite "BranchingPoint", ->
-
-  test "automatically sums the weight of the children", ->
-    elements = [
+  test "returns BranchPoint", ->
+    assert huffman.createTree([], 2) instanceof huffman.BranchPoint
+    assert huffman.createTree([
       {weight: 1}
       {weight: 2}
-      {weight: 3}
-    ]
-    sum = new huffman.BranchingPoint(elements)
-    assert.equal sum.children, elements
-    assert.equal sum.weight, 6
+    ], 2) instanceof huffman.BranchPoint
+
+
+  test "preserve sort order", ->
+    elements = [{weight: 3}, {weight: 1}, {weight: 2}]
+    tree = huffman.createTree(elements, 3)
+    assert.deepEqual tree.children, [{weight: 1}, {weight: 2}, {weight: 3}]
+    assert.deepEqual elements,      [{weight: 3}, {weight: 1}, {weight: 2}]
