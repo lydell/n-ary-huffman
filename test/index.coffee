@@ -1,13 +1,20 @@
+###
+# Copyright 2014, 2015 Simon Lydell
+# X11 (“MIT”) Licensed. (See LICENSE.)
+###
+
 assert  = require("assert")
 huffman = require("../index.coffee")
 
+verifyCode = (item, code)->
+  assert code == item.expected,
+    """code: "#{code}", item: #{JSON.stringify(item)}"""
+
 testCodes = (alphabet, elements)->
-  huffman elements, {alphabet}, (item, code)->
-    assert code == item.expected,
-      """code: "#{code}", item: #{JSON.stringify(item)}"""
+  tree = huffman.createTree(elements, alphabet.length)
+  tree.assignCodeWords alphabet, verifyCode
 
-
-suite "huffman", ->
+suite "codes", ->
 
   suite "binary", ->
 
@@ -97,16 +104,6 @@ suite "huffman", ->
     ]
 
 
-  test "empty list", ->
-    huffman [], {alphabet: "01"}, ->
-      assert false, "Expected callback not to run"
-
-
-  test "prevent infinite recursion", ->
-    assert.throws (-> huffman [], {alphabet: "" }, ->), RangeError
-    assert.throws (-> huffman [], {alphabet: "0"}, ->), RangeError
-
-
   test "alphabet as array", ->
     testCodes ["0", "1"], [
       {value: "a", weight: 4, expected: "000"}
@@ -114,3 +111,79 @@ suite "huffman", ->
       {value: "c", weight: 6, expected: "01"}
       {value: "d", weight: 8, expected: "1"}
     ]
+
+
+  test "mixing trees", ->
+    subTree = huffman.createTree([
+      {value: "sub-a", weight: 4, expected: "ABA"}
+      {value: "sub-b", weight: 3, expected: "ABB"}
+      {value: "sub-c", weight: 6, expected: "AC"}
+      {value: "sub-d", weight: 8, expected: "AA"}
+    ], 3)
+    tree = huffman.createTree([
+      {value: "a", weight: 4, expected: "BB"}
+      {value: "b", weight: 3, expected: "BC"}
+      {value: "c", weight: 6, expected: "BA"}
+      {value: "d", weight: 8, expected: "C"}
+      subTree
+    ], 3)
+    tree.assignCodeWords "ABC", verifyCode
+
+
+  test "custom prefix", ->
+    tree = huffman.createTree([
+      {value: "a", weight: 4, expected: "pBA"}
+      {value: "b", weight: 3, expected: "pBB"}
+      {value: "c", weight: 6, expected: "pC"}
+      {value: "d", weight: 8, expected: "pA"}
+    ], 3)
+    tree.assignCodeWords "ABC", verifyCode, "p"
+
+
+suite "createTree", ->
+
+  test "empty list", ->
+    tree = huffman.createTree([], 2)
+    assert.equal tree.weight, 0
+    assert.equal tree.children.length, 0
+    tree.assignCodeWords "01", ->
+      assert false, "Expected callback not to run"
+
+
+  test "prevent infinite recursion", ->
+    assert.throws (-> huffman.createTree([], 0)), RangeError
+    assert.throws (-> huffman.createTree([], 1)), RangeError
+
+
+  test "returns BranchingPoint", ->
+    assert huffman.createTree([], 2) instanceof huffman.BranchingPoint
+
+
+suite "Padding", ->
+
+  test "zero weight", ->
+    padding = new huffman.Padding
+    assert.equal padding.weight, 0
+
+
+  test "can appear in BranchingPoint children", ->
+    tree = huffman.createTree([
+      {weight: 1}
+      {weight: 1}
+      {weight: 1}
+      {weight: 1}
+    ], 3)
+    assert tree.children[0].children[2] instanceof huffman.Padding
+
+
+suite "BranchingPoint", ->
+
+  test "automatically sums the weight of the children", ->
+    elements = [
+      {weight: 1}
+      {weight: 2}
+      {weight: 3}
+    ]
+    sum = new huffman.BranchingPoint(elements)
+    assert.equal sum.children, elements
+    assert.equal sum.weight, 6
