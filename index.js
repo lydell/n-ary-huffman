@@ -6,22 +6,27 @@
  */
 var BranchPoint, createTree;
 
-createTree = function(originalElements, numBranches) {
-  var branchPointIndex, branchPoints, childIndex, children, element, elementIndex, elements, latestBranchPointIndex, lowestWeight, nextBranchPoint, nextElement, numBranchPoints, numElements, numPadding, root, weight;
-  if (!(numBranches >= 2)) {
-    throw new RangeError("`numBranches` must be at least 2");
+createTree = function(elements, numBranches, options) {
+  var branchPointIndex, branchPoints, childIndex, children, element, elementIndex, latestBranchPointIndex, lowestWeight, nextBranchPoint, nextElement, numBranchPoints, numElements, numPadding, root, weight;
+  if (options == null) {
+    options = {};
   }
-  numElements = originalElements.length;
+  if (!(numBranches >= 2)) {
+    throw new RangeError("`n` must be at least 2");
+  }
+  numElements = elements.length;
   if (numElements === 0) {
     return new BranchPoint([], 0);
   }
   if (numElements === 1) {
-    element = originalElements[0];
+    element = elements[0];
     return new BranchPoint([element], element.weight);
   }
-  elements = originalElements.slice(0).sort(function(a, b) {
-    return a.weight - b.weight;
-  });
+  if (!options.sorted) {
+    elements = elements.slice(0).sort(function(a, b) {
+      return a.weight - b.weight;
+    });
+  }
   numBranchPoints = Math.ceil((numElements - 1) / (numBranches - 1));
   numPadding = 1 + (numBranches - 1) * numBranchPoints - numElements;
   branchPoints = Array(numBranchPoints);

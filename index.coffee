@@ -3,23 +3,24 @@
 # X11 (“MIT”) Licensed. (See LICENSE.)
 ###
 
-createTree = (originalElements, numBranches)->
+createTree = (elements, numBranches, options={})->
   unless numBranches >= 2
-    throw new RangeError("`numBranches` must be at least 2")
+    throw new RangeError("`n` must be at least 2")
 
-  numElements = originalElements.length
+  numElements = elements.length
 
   # Special cases.
   if numElements == 0
     return new BranchPoint([], 0)
   if numElements == 1
-    [element] = originalElements
+    [element] = elements
     return new BranchPoint([element], element.weight)
 
-  # Sort the elements after their weights, in ascending order, so that the first
-  # ones will be the ones with lowest weight. This is done on a shallow working
-  # copy in order not to modify the original array.
-  elements = originalElements[..].sort((a, b)-> a.weight - b.weight)
+  unless options.sorted
+    # Sort the elements after their weights, in ascending order, so that the
+    # first ones will be the ones with lowest weight. This is done on a shallow
+    # working copy in order not to modify the original array.
+    elements = elements[..].sort((a, b)-> a.weight - b.weight)
 
   # A `numBranches`-ary tree can be formed by `1 + (numBranches - 1) * n`
   # elements: There is the root of the tree (`1`), and each branch point adds

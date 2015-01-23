@@ -27,8 +27,8 @@ var huffman = require('n-ary-huffman')
 Usage
 =====
 
-`createTree(elements, n)`
--------------------------
+`createTree(elements, n, [options])`
+------------------------------------
 
 `elements` is an array of objects. Each object is expected to have a `weight`
 property which represents the _weight_ of the object, which is a number.
@@ -37,6 +37,12 @@ Returns a new `BranchPoint`—the root of an `n`-ary huffman tree, consisting of
 all the items in `elements` as well as `BranchPoint`s. Each `BranchPoint` has
 `n` children (except the deepest one which might have fewer, depending on
 `elements.length`).
+
+`options`:
+
+- sorted: `Boolean`. Defaults to `false`. In order to create the tree,
+  `elements` needs to be sorted after the weights in ascending order. Enable
+  this option if `elements` already is sorted this way, to skip sorting again.
 
 `new BranchPoint(elements, weight)`
 -----------------------------------

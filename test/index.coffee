@@ -142,6 +142,18 @@ suite "codes", ->
     tree.assignCodeWords "ABC", verifyCode, "p"
 
 
+  test "already sorted", ->
+    elements = [
+      {value: "b", weight: 3, expected: "001"}
+      {value: "a", weight: 4, expected: "000"}
+      {value: "c", weight: 6, expected: "01"}
+      {value: "d", weight: 8, expected: "1"}
+    ]
+    elements.slice = -> assert false, "expected the elements not to be copied"
+    tree = huffman.createTree(elements, 2, sorted: yes)
+    tree.assignCodeWords "01", verifyCode
+
+
 suite "createTree", ->
 
   test "empty list", ->
