@@ -1,3 +1,10 @@
+### Version 2.1.0 (2015-01-23) ###
+
+- Added: You may now skip the sorting in `createTree()` by passing the `{sorted:
+  true}` option, as an optimization if you already know that the elements are
+  sorted properly.
+
+
 ### Version 2.0.0 (2015-01-22) ###
 
 - Changed: New API. Instead of exporting a single function, a
