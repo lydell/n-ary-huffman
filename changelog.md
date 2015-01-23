@@ -1,3 +1,9 @@
+### Version 2.1.1 (2015-01-23) ###
+
+- Fixed: An error in the npm package. This version is otherwise identical to
+  version 2.1.0.
+
+
 ### Version 2.1.0 (2015-01-23) ###
 
 - Added: You may now skip the sorting in `createTree()` by passing the `{sorted:
