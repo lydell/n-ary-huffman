@@ -26,7 +26,7 @@
   var createTree = require("huffman").createTree
 
   function huffman(elements, options, callback) {
-    var tree = huffman.createTree(elements, options.alphabet.length)
+    var tree = createTree(elements, options.alphabet.length)
     tree.assignCodeWords(options.alphabet, callback)
   }
   ```
