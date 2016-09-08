@@ -4,6 +4,9 @@
   "license": "MIT",
   "description": "An n-ary Huffman algorithm implementation.",
   "repository": "lydell/n-ary-huffman",
+  "files": [
+    "index.js"
+  ],
   "keywords": [
     "huffman",
     "n-ary"
