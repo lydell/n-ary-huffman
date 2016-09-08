@@ -62,10 +62,15 @@ all the items in `elements` as well as `BranchPoint`s. Each `BranchPoint` has
   `elements` needs to be sorted after the weights in descending order. Enable
   this option if `elements` already is sorted this way, to skip sorting again.
 
-`new BranchPoint(elements, weight)`
+`new BranchPoint(children, weight)`
 -----------------------------------
 
-Instances have the arguments as properties.
+Instance properties:
+
+- children: `children`
+- weight: `weight`
+
+See `createTree(…)` above for more information.
 
 `BranchPoint.prototype.assignCodeWords(alphabet, callback, prefix="")`
 ----------------------------------------------------------------------
