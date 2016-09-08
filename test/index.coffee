@@ -68,18 +68,29 @@ suite "codes", ->
     ]
 
 
-  test "Equal weights", ->
+  test "equal weights", ->
     testCodes "01", [
-      {value: "a", weight: 1, expected: "011"}
-      {value: "b", weight: 1, expected: "010"}
-      {value: "c", weight: 1, expected: "001"}
-      {value: "d", weight: 1, expected: "000"}
-      {value: "e", weight: 1, expected: "11"}
-      {value: "f", weight: 1, expected: "10"}
+      {value: "a", weight: 1, expected: "10"}
+      {value: "b", weight: 1, expected: "11"}
+      {value: "c", weight: 1, expected: "000"}
+      {value: "d", weight: 1, expected: "001"}
+      {value: "e", weight: 1, expected: "010"}
+      {value: "f", weight: 1, expected: "011"}
     ]
 
 
-  test "“Unusual” weights", ->
+  test "preserve “original order”", ->
+    testCodes "abcdefgh", [
+      {value: "a", weight: 1, expected: "a"}
+      {value: "b", weight: 1, expected: "b"}
+      {value: "c", weight: 1, expected: "c"}
+      {value: "d", weight: 1, expected: "d"}
+      {value: "e", weight: 1, expected: "e"}
+      {value: "f", weight: 1, expected: "f"}
+    ]
+
+
+  test "“unusual” weights", ->
     testCodes "01", [
       {value: "a", weight:    -4, expected: "111"}
       {value: "b", weight:     0, expected: "110"}
@@ -144,10 +155,10 @@ suite "codes", ->
 
   test "already sorted", ->
     elements = [
-      {value: "b", weight: 3, expected: "001"}
-      {value: "a", weight: 4, expected: "000"}
-      {value: "c", weight: 6, expected: "01"}
       {value: "d", weight: 8, expected: "1"}
+      {value: "c", weight: 6, expected: "01"}
+      {value: "a", weight: 4, expected: "000"}
+      {value: "b", weight: 3, expected: "001"}
     ]
     elements.slice = -> assert false, "expected the elements not to be copied"
     tree = huffman.createTree(elements, 2, sorted: yes)

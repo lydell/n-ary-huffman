@@ -41,7 +41,7 @@ all the items in `elements` as well as `BranchPoint`s. Each `BranchPoint` has
 `options`:
 
 - sorted: `Boolean`. Defaults to `false`. In order to create the tree,
-  `elements` needs to be sorted after the weights in ascending order. Enable
+  `elements` needs to be sorted after the weights in descending order. Enable
   this option if `elements` already is sorted this way, to skip sorting again.
 
 `new BranchPoint(elements, weight)`

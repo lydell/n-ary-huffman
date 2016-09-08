@@ -17,10 +17,10 @@ createTree = (elements, numBranches, options={})->
     return new BranchPoint([element], element.weight)
 
   unless options.sorted
-    # Sort the elements after their weights, in ascending order, so that the
-    # first ones will be the ones with lowest weight. This is done on a shallow
-    # working copy in order not to modify the original array.
-    elements = elements[..].sort((a, b)-> a.weight - b.weight)
+    # Sort the elements after their weights, in descending order, so that the
+    # first ones will be the ones with highest weight. This is done on a shallow
+    # copy in order not to modify the original array.
+    elements = elements[..].sort((a, b)-> b.weight - a.weight)
 
   # A `numBranches`-ary tree can be formed by `1 + (numBranches - 1) * n`
   # elements: There is the root of the tree (`1`), and each branch point adds
@@ -50,26 +50,27 @@ createTree = (elements, numBranches, options={})->
   # unshifting arrays for performance.
   latestBranchPointIndex = 0
   branchPointIndex       = 0
-  elementIndex           = 0
+  elementIndex           = numElements - 1
 
   # The first branch point is the only one that can have fewer than
   # `numBranches` branches. One _could_ add `numPadding` dummy elements, but
   # this algorithm does not. (Why would that be useful?)
   if numPadding > 0
-    elementIndex = numBranches - numPadding
+    numChildren = numBranches - numPadding
     weight = 0
-    children = Array(elementIndex)
+    children = Array(numChildren)
     childIndex = 0
-    while childIndex < elementIndex
-      element = elements[childIndex]
+    while childIndex < numChildren
+      element = elements[elementIndex]
       children[childIndex] = element
       weight += element.weight
+      elementIndex--
       childIndex++
     branchPoints[0] = new BranchPoint(children, weight)
     latestBranchPointIndex = 1
 
   # Create (the rest of) the `numBranchPoints` branch points.
-  nextElement = elements[elementIndex]
+  nextElement = if elementIndex >= 0 then elements[elementIndex] else null
   while latestBranchPointIndex < numBranchPoints
     weight = 0
     children = Array(numBranches)
@@ -85,8 +86,8 @@ createTree = (elements, numBranches, options={})->
         nextBranchPoint = branchPoints[branchPointIndex]
       else
         lowestWeight = nextElement
-        elementIndex++
-        nextElement = elements[elementIndex]
+        elementIndex--
+        nextElement = if elementIndex >= 0 then elements[elementIndex] else null
       children[childIndex] = lowestWeight
       weight += lowestWeight.weight
       childIndex++
