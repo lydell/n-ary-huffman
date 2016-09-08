@@ -3,15 +3,33 @@ Overview [![Build Status](https://travis-ci.org/lydell/n-ary-huffman.svg?branch=
 
 ```js
 var huffman = require("n-ary-huffman")
-var list = require("./list")
 
-var elements = list.map(function(item) { item.weight = Math.random() })
+var names = ["Alfa", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf"]
+var items = names.map(function(name, index) {
+  return {
+    name: name,
+    weight: index,
+    codeWord: null
+  }
+})
+
 var alphabet = "0123"
 
-var tree = huffman.createTree(elements, alphabet.length)
-tree.assignCodeWords(alphabet, function(element, code) {
-  console.log(element, code)
+var tree = huffman.createTree(items, alphabet.length)
+tree.assignCodeWords(alphabet, function(item, codeWord) {
+  item.codeWord = codeWord
 })
+
+console.log(items)
+// [
+//   { name: 'Alfa',    weight: 0, codeWord: '13' },
+//   { name: 'Bravo',   weight: 1, codeWord: '12' },
+//   { name: 'Charlie', weight: 2, codeWord: '11' },
+//   { name: 'Delta',   weight: 3, codeWord: '10' },
+//   { name: 'Echo',    weight: 4, codeWord: '3'  },
+//   { name: 'Foxtrot', weight: 5, codeWord: '2'  },
+//   { name: 'Golf',    weight: 6, codeWord: '0'  }
+// ]
 ```
 
 Installation
