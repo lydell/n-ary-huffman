@@ -1,3 +1,9 @@
+### Version 3.1.0 (2016-11-06) ###
+
+- Added: You may now use custom weight comparison in `createTree()` by passing
+  the `{compare: function(a, b) { return a.weight - b.weight }}` option.
+
+
 ### Version 3.0.0 (2016-09-08) ###
 
 This release contains one single change, and it is a **breaking change.** That
