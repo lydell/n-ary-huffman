@@ -1,3 +1,12 @@
+### Version 4.0.0 (2018-10-21) ###
+
+- Removed: The custom weight comparison feature added in 3.1.0. It turned out to
+  be a bad idea since it makes sorting non-deterministic. The use case was being
+  able to consider weights that are close to each other to be equal. In that
+  case it’s better to normalize the weights before running the Huffman
+  algorithm.
+
+
 ### Version 3.1.0 (2016-11-06) ###
 
 - Added: You may now use custom weight comparison in `createTree()` by passing
