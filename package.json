@@ -12,11 +12,11 @@
     "n-ary"
   ],
   "scripts": {
-    "test": "mocha --ui tdd --compilers coffee:coffee-script/register",
+    "test": "mocha --ui tdd --require coffeescript/register \"test/**/*.coffee\"",
     "build": "coffee --compile --bare index.coffee"
   },
   "devDependencies": {
-    "coffee-script": "~1.11.0",
-    "mocha": "^3.0.2"
+    "coffeescript": "1.12.7",
+    "mocha": "5.2.0"
   }
 }
