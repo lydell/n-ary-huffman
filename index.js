@@ -7,13 +7,10 @@
 var BranchPoint, createTree;
 
 createTree = function(elements, numBranches, options) {
-  var branchPointIndex, branchPoints, childIndex, children, compare, element, elementIndex, latestBranchPointIndex, lowestWeight, nextBranchPoint, nextElement, numBranchPoints, numChildren, numElements, numPadding, ref, ref1, root, sorted, weight;
+  var branchPointIndex, branchPoints, childIndex, children, element, elementIndex, latestBranchPointIndex, lowestWeight, nextBranchPoint, nextElement, numBranchPoints, numChildren, numElements, numPadding, root, weight;
   if (options == null) {
     options = {};
   }
-  sorted = (ref = options.sorted) != null ? ref : false, compare = (ref1 = options.compare) != null ? ref1 : function(a, b) {
-    return a.weight - b.weight;
-  };
   if (!(numBranches >= 2)) {
     throw new RangeError("`n` must be at least 2");
   }
@@ -25,9 +22,9 @@ createTree = function(elements, numBranches, options) {
     element = elements[0];
     return new BranchPoint([element], element.weight);
   }
-  if (!sorted) {
+  if (!options.sorted) {
     elements = elements.slice(0).sort(function(a, b) {
-      return compare(b, a);
+      return b.weight - a.weight;
     });
   }
   numBranchPoints = Math.ceil((numElements - 1) / (numBranches - 1));
@@ -58,7 +55,7 @@ createTree = function(elements, numBranches, options) {
     childIndex = 0;
     nextBranchPoint = branchPoints[branchPointIndex];
     while (childIndex < numBranches) {
-      if ((nextElement == null) || ((nextBranchPoint != null) && compare(nextBranchPoint, nextElement) <= 0)) {
+      if ((nextElement == null) || ((nextBranchPoint != null) && nextBranchPoint.weight <= nextElement.weight)) {
         lowestWeight = nextBranchPoint;
         branchPointIndex++;
         nextBranchPoint = branchPoints[branchPointIndex];

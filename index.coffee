@@ -3,9 +3,7 @@
 # X11 (“MIT”) Licensed. (See LICENSE.)
 ###
 
-createTree = (elements, numBranches, options = {}) ->
-  {sorted = false, compare = (a, b) -> a.weight - b.weight} = options
-
+createTree = (elements, numBranches, options={})->
   unless numBranches >= 2
     throw new RangeError("`n` must be at least 2")
 
@@ -18,11 +16,11 @@ createTree = (elements, numBranches, options = {}) ->
     [element] = elements
     return new BranchPoint([element], element.weight)
 
-  unless sorted
+  unless options.sorted
     # Sort the elements after their weights, in descending order, so that the
     # first ones will be the ones with highest weight. This is done on a shallow
     # copy in order not to modify the original array.
-    elements = elements[..].sort((a, b) -> compare(b, a))
+    elements = elements[..].sort((a, b)-> b.weight - a.weight)
 
   # A `numBranches`-ary tree can be formed by `1 + (numBranches - 1) * n`
   # elements: There is the root of the tree (`1`), and each branch point adds
@@ -82,7 +80,7 @@ createTree = (elements, numBranches, options = {}) ->
     while childIndex < numBranches
       # The smallest weight is either the next element or the next branch point.
       if not nextElement? or # No elements, only branch points left.
-         (nextBranchPoint? and compare(nextBranchPoint, nextElement) <= 0)
+         (nextBranchPoint? and nextBranchPoint.weight <= nextElement.weight)
         lowestWeight = nextBranchPoint
         branchPointIndex++
         nextBranchPoint = branchPoints[branchPointIndex]
@@ -100,9 +98,9 @@ createTree = (elements, numBranches, options = {}) ->
   root
 
 class BranchPoint
-  constructor: (@children, @weight) ->
+  constructor: (@children, @weight)->
 
-  assignCodeWords: (alphabet, callback, prefix = "") ->
+  assignCodeWords: (alphabet, callback, prefix="")->
     index = 0
     for node in @children by -1
       codeWord = prefix + alphabet[index++]

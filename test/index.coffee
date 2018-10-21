@@ -161,31 +161,8 @@ suite "codes", ->
       {value: "b", weight: 3, expected: "001"}
     ]
     elements.slice = -> assert false, "expected the elements not to be copied"
-    tree = huffman.createTree(elements, 2, {sorted: yes})
+    tree = huffman.createTree(elements, 2, sorted: yes)
     tree.assignCodeWords "01", verifyCode
-
-
-  test "custom comparison", ->
-    minDiff = 2
-    compare = (a, b) ->
-      diff = a.weight - b.weight
-      if a instanceof huffman.BranchPoint or b instanceof huffman.BranchPoint
-        return diff
-      else
-        return switch
-          when diff <= -minDiff
-            -1
-          when diff >= minDiff
-            +1
-          else
-            0
-    tree = huffman.createTree([
-      {value: "a", weight: 3, expected: "BA"}
-      {value: "b", weight: 4, expected: "BB"}
-      {value: "c", weight: 6, expected: "C"}
-      {value: "d", weight: 8, expected: "A"}
-    ], 3, {compare})
-    tree.assignCodeWords "ABC", verifyCode
 
 
 suite "createTree", ->

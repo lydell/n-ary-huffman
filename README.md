@@ -62,20 +62,6 @@ all the items in `elements` as well as `BranchPoint`s. Each `BranchPoint` has
   `elements` needs to be sorted after the weights in descending order. Enable
   this option if `elements` already is sorted this way, to skip sorting again.
 
-- compare: `Function`. Defaults to `function(a, b) { return a.weight - b.weight }`.
-  This function takes two tree elements, `a` and `b`, as parameters and returns
-  a number, `c`, which tells how the weights of `a` and `b` compare:
-
-  - `c < 0` → `a` is considered smaller than `b`.
-  - `c === 0` → `a` is considered equal to `b`.
-  - `c > 0` → `a` is considered larger than `b`.
-
-  In other words, this function works just like the callback passed to
-  `Array.prototype.sort`.
-
-  This lets you define custom comparisons, for example if you want to consider
-  weights that are close to each other to be equal.
-
 `new BranchPoint(children, weight)`
 -----------------------------------
 
